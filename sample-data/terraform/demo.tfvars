@@ -2,7 +2,7 @@ project             = "analytics-engg-framework-demo"
 region              = "us-central1"
 sample_default_date = "2024-02-26"
 
-git_token             = "***REMOVED***"
+git_token             = "YOUR_GIT_TOKEN"
 dataform_repositories = {
   sample-repo-1 = {
     remote_repo_url      = "https://github.com/oscarpulido55/aef-sample-dataform-repo.git"
