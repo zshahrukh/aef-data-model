@@ -21,6 +21,22 @@ This reference Data Model management repository is your central hub for streamli
 
 ![data_model&metadata_trategy.png](data_model&metadata_trategy.png)
 
+### Referenced Dataform Repositories
+If your data model includes datasets referenced in Dataform repositories, you can choose to create those datasets as part of this data model deployment. To do so, set the Terraform variable ***create_dataform_repositories*** to ```true```. This controls whether the Dataform scripts found in the repositories will be created alongside other Terraform resources. If set to false, Dataform repositories should be created as an additional step in your CI/CD pipeline.
+
+If you decide to use this repository to create datasets referenced in your Dataform repositories, define those datasets in the ***dataform.json*** file using the following format:
+```json lines
+{
+  ...
+  "vars": {
+    "dataset_id_<DATASET_IDENTIFIER>":"<YOUR_DATASET_NAME>",
+    "dataset_projectid_<DATASET_IDENTIFIER>":"<YOUR_DATASET_PROJECT>",
+    "dataset_location_<DATASET_IDENTIFIER>":"<YOUR_DATASET_LOCATION>",
+    ...
+  }
+}
+```
+
 ## Usage
 
 ### 1. Dataplex:

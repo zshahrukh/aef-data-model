@@ -25,27 +25,26 @@ data "google_project" "project" {
 
 # Create sample storage bucket.
 resource "google_storage_bucket" "sample_data_bucket" {
-  name                     = var.sample_data_bucket
-  location                 = var.region
-  project                  = var.project
+  name                     = "${var.sample_data_bucket_project}-my-sample-data-bucket"
+  location                 = var.sample_data_bucket_region
+  project                  = var.sample_data_bucket_project
   public_access_prevention = "enforced"
   force_destroy            = true
 }
 
 # Create temp storage bucket.
 resource "google_storage_bucket" "temp_data_bucket" {
-  name                     = var.temp_data_bucket
-  location                 = var.region
-  project                  = var.project
+  name                     = "${var.temp_data_bucket_project}-temp"
+  location                 = var.temp_data_bucket_region
+  project                  = var.temp_data_bucket_project
   public_access_prevention = "enforced"
   force_destroy            = true
 }
 
-# Create sample DDLs bucket.
 resource "google_storage_bucket" "sample_ddl_bucket" {
-  name                     = var.sample_ddl_bucket
-  location                 = var.region
-  project                  = var.project
+  name                     = "${var.sample_ddl_bucket_project}-my-sample-ddl-bucket"
+  location                 = var.sample_ddl_bucket_region
+  project                  = var.sample_ddl_bucket_project
   public_access_prevention = "enforced"
   force_destroy            = true
 }
@@ -72,14 +71,14 @@ resource "google_storage_bucket_object" "ddl_files" {
 resource "google_bigquery_connection" "connection" {
   #connection_id = local.connections["connection_name"]["connection"]
   connection_id = "sample-connection"
-  project       = var.project
-  location      = var.region
+  project       = var.sample_connection_project
+  location      = var.sample_connection_region
   cloud_resource {}
 }
 
 # Grants permissions to the service account of the connection created in the last step.
 resource "google_project_iam_member" "connectionPermissionGrant" {
-  project = var.project
+  project = var.sample_connection_project
   role    = "roles/storage.objectViewer"
   member  = format("serviceAccount:%s", google_bigquery_connection.connection.cloud_resource[0].service_account_id)
 }
@@ -96,7 +95,7 @@ module "fake_on_prem_instance" {
   project_id     = var.project
   network_config = {
     connectivity = {
-      public_ipv4 = false
+      public_ipv4 = true
       psa_config  = {
         private_network = module.vpc.self_link
       }

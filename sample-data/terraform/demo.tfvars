@@ -1,6 +1,5 @@
 project             = "analytics-engg-framework-demo"
 region              = "us-central1"
-sample_default_date = "2024-02-26"
 
 git_token             = "YOUR_GIT_TOKEN"
 dataform_repositories = {
@@ -9,8 +8,11 @@ dataform_repositories = {
   }
 }
 
-sample_data_bucket  = "analytics-engg-framework-demo-my-sample-data-bucket"
-temp_data_bucket = "aef-analytics-engg-framework-demo-temp"
+sample_connection_project = "analytics-engg-framework-demo"
+sample_connection_region = "us-central1"
+
+sample_data_bucket_project = "analytics-engg-framework-demo"
+sample_data_bucket_region = "us-central1"
 sample_data_files = {
   "location" = {
     name   = "locations/location.csv"
@@ -30,7 +32,11 @@ sample_data_files = {
   }
 }
 
-sample_ddl_bucket  = "analytics-engg-framework-demo-my-sample-ddl-bucket"
+temp_data_bucket_region = "us-central1"
+temp_data_bucket_project = "analytics-engg-framework-demo"
+
+sample_ddl_bucket_project  = "analytics-engg-framework-demo"
+sample_ddl_bucket_region = "us-central1"
 sample_ddl_files = {
   "sales" = {
     name   = "raw_sales.sql"

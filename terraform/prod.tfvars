@@ -12,9 +12,6 @@ dataform_repositories_git_token = "YOUR_GIT_TOKEN"
 dataform_repositories           = {
   sample-repo-1 = {
     remote_repo_url = "https://github.com/oscarpulido55/aef-sample-dataform-repo.git"
-  },
-  sample-repo-2 = {
-    remote_repo_url = "https://github.com/oscarpulido55/aef-sample-dataform-repo-2.git"
   }
 }
 

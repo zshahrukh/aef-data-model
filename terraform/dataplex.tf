@@ -62,9 +62,9 @@ resource "google_dataplex_asset" "dataset_assets" {
 #Create GCS buckets Assets in Dataplex
 resource "google_dataplex_asset" "gcs_assets" {
   for_each      = var.data_buckets
-  project       = each.value.project
-  name          = each.key
-  location      = each.value.region
+  project       = var.project
+  name          = each.value.name
+  location      = var.region
   lake          = each.value.dataplex_lake
   dataplex_zone = each.value.dataplex_zone
   discovery_spec {
