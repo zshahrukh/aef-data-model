@@ -1,4 +1,4 @@
-project = "analytics-engg-framework-demo"
+project = "<PROJECT_ID>"
 region  = "us-central1"
 domain  = "google"
 
@@ -8,22 +8,9 @@ create_dataform_repositories    = true
 compile_dataform_repositories   = true
 execute_dataform_repositories   = true
 create_dataform_datasets        = true
-dataform_repositories_git_token = "YOUR_GIT_TOKEN"
 dataform_repositories           = {
   sample-repo-1 = {
-    remote_repo_url = "https://github.com/oscarpulido55/aef-sample-dataform-repo.git"
-  }
-}
-
-create_data_buckets = false
-data_buckets        = {
-  data-bucket-1 = {
-    name          = "analytics-engg-framework-demo-my-sample-data-bucket"
-    region        = "us-central1"
-    project       = "analytics-engg-framework-demo"
-    dataplex_lake = "aef-sales-lake"
-    dataplex_zone = "aef-landing-sample-zone"
-    auto_discovery_of_tables = true
+    remote_repo_url = "https://github.com/<GITHUB_SPACE>/aef-sample-dataform-repo.git"
   }
 }
 
@@ -31,13 +18,25 @@ create_ddl_buckets  = false
 run_ddls_in_buckets = true
 ddl_buckets         = {
   ddl-bucket-1 = {
-    bucket_name          = "analytics-engg-framework-demo-my-sample-ddl-bucket"
-    bucket_region        = "us-central1"
-    bucket_project       = "analytics-engg-framework-demo"
     ddl_flavor           = "bigquery"
-    ddl_project_id       = "analytics-engg-framework-demo"
+    bucket_name          = "<PROJECT_ID>-my-sample-ddl-bucket"
+    bucket_region        = "us-central1"
+    bucket_project       = "<PROJECT_ID>"
+    ddl_project_id       = "<PROJECT_ID>"
     ddl_dataset_id       = "aef_landing_sample_dataset"
-    ddl_data_bucket_name = "analytics-engg-framework-demo-my-sample-data-bucket"
-    ddl_connection_name  = "projects/analytics-engg-framework-demo/locations/us-central1/connections/sample-connection"
+    ddl_data_bucket_name = "<PROJECT_ID>-my-sample-data-bucket"
+    ddl_connection_name  = "projects/<PROJECT_ID>/locations/us-central1/connections/sample-connection"
+  }
+}
+
+create_data_buckets = false
+data_buckets        = {
+  data-bucket-1 = {
+    name          = "<PROJECT_ID>-my-sample-data-bucket"
+    region        = "us-central1"
+    project       = "<PROJECT_ID>"
+    dataplex_lake = "aef-sales-lake"
+    dataplex_zone = "aef-landing-sample-zone"
+    auto_discovery_of_tables = true
   }
 }

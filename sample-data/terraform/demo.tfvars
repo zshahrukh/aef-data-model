@@ -1,17 +1,16 @@
-project             = "analytics-engg-framework-demo"
+project             = "<PROJECT_ID>"
 region              = "us-central1"
 
-git_token             = "YOUR_GIT_TOKEN"
 dataform_repositories = {
   sample-repo-1 = {
-    remote_repo_url      = "https://github.com/oscarpulido55/aef-sample-dataform-repo.git"
+    remote_repo_url      = "https://github.com/<GITHUB_SPACE>/aef-sample-dataform-repo.git"
   }
 }
 
-sample_connection_project = "analytics-engg-framework-demo"
+sample_connection_project = "<PROJECT_ID>"
 sample_connection_region = "us-central1"
 
-sample_data_bucket_project = "analytics-engg-framework-demo"
+sample_data_bucket_project = "<PROJECT_ID>"
 sample_data_bucket_region = "us-central1"
 sample_data_files = {
   "location" = {
@@ -29,13 +28,17 @@ sample_data_files = {
   "sales-dt2" = {
     name   = "sales/dt=2024-03-12/sales_dt2.csv"
     source = "../gcs-files/sales_dt2.csv"
+  },
+  "mainframe-file" = {
+    name   = "companies_mainframe/companies_data.dat"
+    source = "../gcs-files/companies_data.dat"
   }
 }
 
 temp_data_bucket_region = "us-central1"
-temp_data_bucket_project = "analytics-engg-framework-demo"
+temp_data_bucket_project = "<PROJECT_ID>"
 
-sample_ddl_bucket_project  = "analytics-engg-framework-demo"
+sample_ddl_bucket_project  = "<PROJECT_ID>"
 sample_ddl_bucket_region = "us-central1"
 sample_ddl_files = {
   "sales" = {
