@@ -1,6 +1,6 @@
 project = "<PROJECT_ID>"
 region  = "us-central1"
-domain  = "google"
+domain  = "example"
 
 include_metadata_in_tfe_deployment = true
 

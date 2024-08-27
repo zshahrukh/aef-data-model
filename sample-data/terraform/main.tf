@@ -113,7 +113,7 @@ module "fake_on_prem_instance" {
 module "vpc" {
   source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric/modules/net-vpc"
   project_id = var.project
-  name       = "fake-on-prem-network-for-sql"
+  name       = "sample-vpc"
   psa_configs = [{
     ranges = { cloud-sql = "10.60.0.0/16" }
   }]
@@ -124,6 +124,23 @@ module "vpc" {
       ip_cidr_range = "10.0.0.0/24"
     }
   ]
+}
+
+module "firewall" {
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric/modules/net-vpc-firewall"
+  project_id = var.project
+  network    = module.vpc.name
+  default_rules_config = {
+    disabled = true
+  }
+  ingress_rules = {
+    allow-ingress-all = {
+      description = "Allow subnet communication on all ports."
+      source_ranges = ["10.0.0.0/24"]
+      destination_ranges = ["10.0.0.0/24"]
+      rules= [{ protocol = "all", ports = [] }]
+    }
+  }
 }
 
 resource "google_sql_user" "user" {
@@ -159,7 +176,7 @@ resource "null_resource" "cleanup" {
       nohup ./cloud-sql-proxy ${self.triggers.project}:${self.triggers.region}:fake-on-prem-instance >/dev/null & >/dev/null &
       sleep 3
       psql "host=127.0.0.1 sslmode=disable dbname=postgres user=user1 password=changeme" -f ../fake-on-prem-postgresql/cleanup_db.sql
-      gcloud compute networks peerings delete servicenetworking-googleapis-com --network=fake-on-prem-network-for-sql
+      gcloud compute networks peerings delete servicenetworking-googleapis-com --network=sample-vpc
       PID=$(lsof -i tcp:5432 | grep LISTEN | awk '{print $2}')
       kill -9 $PID
       rm cloud-sql-proxy
