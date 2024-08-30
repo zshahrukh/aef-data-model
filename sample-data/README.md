@@ -10,8 +10,8 @@ Use this in case you want to create some sample data sources (GCS bucket with so
 #### Steps
 1. **Terraform:** Define your terraform variables. You could create a `.tfvars` file like this:
     ```hcl
-    project             = "my-project"
-    region              = "us-central1"
+    project             = "<PROJECT>"
+    region              = "<REGION>"
     sample_data_bucket  = "my-sample-data-bucket"
     sample_default_date = "2024-02-26"
     
@@ -30,8 +30,8 @@ Use this in case you want to create some sample data sources (GCS bucket with so
       },
       ...
     }
-    sample_connection_project = "<PROJECT_ID>"
-    sample_connection_region = "us-central1"
+    sample_connection_project = "<PROJECT>"
+    sample_connection_region = "<REGION>"
     ```
 <!-- BEGIN TFDTFOC -->
 ## Variables
