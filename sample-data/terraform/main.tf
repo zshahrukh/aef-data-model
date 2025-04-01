@@ -167,8 +167,9 @@ resource "null_resource" "init_db" {
 
 resource "null_resource" "cleanup" {
   triggers = {
-    region      = var.region
+    region = var.region
     project = var.project
+    sample_vpc = module.vpc.name
   }
   provisioner "local-exec" {
     when    = destroy
@@ -176,7 +177,7 @@ resource "null_resource" "cleanup" {
       nohup ./cloud-sql-proxy ${self.triggers.project}:${self.triggers.region}:fake-on-prem-instance >/dev/null & >/dev/null &
       sleep 3
       psql "host=127.0.0.1 sslmode=disable dbname=postgres user=user1 password=changeme" -f ../fake-on-prem-postgresql/cleanup_db.sql
-      gcloud compute networks peerings delete servicenetworking-googleapis-com --network=sample-vpc
+      gcloud compute networks peerings delete servicenetworking-googleapis-com --network=${self.triggers.sample_vpc} --project=${self.triggers.project}
       PID=$(lsof -i tcp:5432 | grep LISTEN | awk '{print $2}')
       kill -9 $PID
       rm cloud-sql-proxy

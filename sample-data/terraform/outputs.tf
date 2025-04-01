@@ -23,3 +23,7 @@ output "git_path" {
 output "dataform_config_connection" {
   value = local.connections
 }
+
+output "fake_onprem_sql_ip" {
+  value = module.fake_on_prem_instance.ip
+}

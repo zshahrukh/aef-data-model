@@ -44,7 +44,11 @@ locals {
     )
   }
 
-  #Reads dataform.json files
+  /* Extract datasets defined via dataform.json variables if any, it should include 3 variables for each dataset with next format:
+      "dataset_id_<DATASET_IDENTIFIER>":"<YOUR_DATASET_NAME>",
+      "dataset_projectid_<DATASET_IDENTIFIER>":"<YOUR_DATASET_PROJECT>",
+      "dataset_location_<DATASET_IDENTIFIER>":"<YOUR_DATASET_LOCATION>",
+  */
   dataform_configs = [
     for repo_key, repo_data in var.dataform_repositories :
     jsondecode(data.github_repository_file.dataform_config[repo_key].content)
@@ -54,11 +58,6 @@ locals {
     for config in local.dataform_configs : config.vars
   ]...)
 
-  /* Create datasets defined via dataform.json variables if any, it should include 3 variables for each dataset with next format:
-      "dataset_id_<DATASET_IDENTIFIER>":"<YOUR_DATASET_NAME>",
-      "dataset_projectid_<DATASET_IDENTIFIER>":"<YOUR_DATASET_PROJECT>",
-      "dataset_location_<DATASET_IDENTIFIER>":"<YOUR_DATASET_LOCATION>",
-  */
   variables = ({
     for k, v in local.all_vars : split("_", k)[2] => {
       (split("_", k)[1]) = v
@@ -66,7 +65,33 @@ locals {
     if substr(k, 0, 8) == "dataset_"
   })
 
-  datasets = {
+  dataform_datasets = {
     for dataset_name, attribute_list in local.variables : dataset_name => merge(attribute_list...)
   }
+
+  all_created_datasets = merge(
+    { for k, v in var.ddl_buckets :
+      "${v.ddl_dataset_id}-${v.ddl_project_id}-${v.ddl_region}" => {
+        dataset_id = v.ddl_dataset_id
+        project    = v.ddl_project_id
+        location   = v.ddl_region
+        lake       = v.dataplex_lake
+        zone       = v.dataplex_zone
+        from_gcs   = true
+        from_dataform = false
+      } if v.ddl_flavor == "bigquery"
+    },
+    { for k, v in local.dataform_datasets :
+      "${v.id}-${v.projectid}-${v.location}" => {
+        dataset_id  = v.id
+        project     = v.projectid
+        location    = v.location
+        description = v.description
+        lake        = v.lake
+        zone        = v.zone
+        from_dataform = true
+        from_gcs   = false
+      }
+    }
+  )
 }

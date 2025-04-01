@@ -94,6 +94,10 @@ def write_json_file(project_id, location, output_filename="cortex_config.json"):
                 "processing": "K9_PROCESSING",
                 "reporting": "K9_REPORTING"
             }
+        },
+        "VertexAI": {
+            "region": "REGION",
+            "processingDataset": "VERTEXDATASET"
         }
     }
     with open(output_filename, "w") as outfile:
@@ -108,11 +112,16 @@ def add_lines_to_file(filename, new_lines):
         new_lines (list): A list of strings representing the new lines to add.
     """
     try:
-        with open(filename, 'a') as file:  # 'a' for append mode
+        with open(filename, 'a') as file:
+            file.write('\n')
             for line in new_lines:
-                file.write(line + '\n')  # Add a newline character
+                file.write(line + '\n')
         print("Lines added successfully!")
-
+        with open(filename, 'r') as file:
+            file_content = file.read()
+            new_content = file_content.replace("requests>=2.32.*", "requests==2.32.*")
+        with open(filename, 'w') as file:
+            file.write(new_content)
     except FileNotFoundError:
         print(f"Error: File '{filename}' not found.")
     except IOError:

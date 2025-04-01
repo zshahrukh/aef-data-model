@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Create data storage bucket.
+# Create data storage buckets.
 resource "google_storage_bucket" "data_buckets" {
   for_each    = var.create_data_buckets ? var.data_buckets : {}
   name                     = each.value.name
@@ -22,7 +22,7 @@ resource "google_storage_bucket" "data_buckets" {
   force_destroy            = false
 }
 
-# Create bucket containing DDLs.
+# Create buckets containing DDLs.
 resource "google_storage_bucket" "ddl_buckets" {
   for_each    = var.create_ddl_buckets ? var.ddl_buckets : {}
   name                     = each.value.bucket_name
@@ -30,4 +30,11 @@ resource "google_storage_bucket" "ddl_buckets" {
   project                  = each.value.bucket_project
   public_access_prevention = "enforced"
   force_destroy            = false
+}
+
+resource "google_bigquery_dataset" "gcs_datasets" {
+  for_each    = var.create_ddl_buckets_datasets ? { for k, v in local.all_created_datasets : k => v if v.from_gcs } : {}
+  dataset_id  = each.value.dataset_id
+  project     = each.value.project
+  location    = each.value.location
 }

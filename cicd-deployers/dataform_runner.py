@@ -17,6 +17,8 @@ import time
 import argparse
 import collections
 import sys
+import json
+import re
 from google.cloud import dataform_v1beta1
 from google.cloud import asset_v1
 df_client = dataform_v1beta1.DataformClient()
@@ -73,24 +75,30 @@ def compile_workflow(repo_uri: str, branch: str):
     return name
 
 
-def get_workflow_state(workflow_invocation_id: str):
+def get_workflow_status(workflow_invocation_name):
     """Monitors the status of a Dataform workflow invocation.
 
     Args:
-        workflow_invocation_id (str): The ID of the workflow invocation.
+        workflow_invocation_name (str): The ID of the workflow invocation.
+        df_client: The Dataform client object.
     """
-    request = dataform_v1beta1.GetWorkflowInvocationRequest(
-        name=workflow_invocation_id
-    )
-    response = df_client.get_workflow_invocation(request)
-    state = response.state.name
-    logging.info(f'workflow state: {state}')
-    if state == 'RUNNING':
-        time.sleep(10)
-    elif state in ('FAILED', 'CANCELING', 'CANCELLED'):
-        raise Exception(f'Error while running workflow {workflow_invocation_id}')
-    elif state == 'SUCCEEDED':
-        return
+    while True:
+        request = dataform_v1beta1.GetWorkflowInvocationRequest(
+            name=workflow_invocation_name
+        )
+        response = df_client.get_workflow_invocation(request)
+        state = response.state.name
+        logging.info(f'workflow state: {state} for {workflow_invocation_name}')
+
+        if state == 'RUNNING':
+            time.sleep(4)
+            continue
+        if state in ('FAILED', 'CANCELING', 'CANCELLED'):
+            raise Exception(f'Error while running workflow {workflow_invocation_name}')
+        elif state == 'SUCCEEDED':
+            return
+        break
+    return
 
 
 def run_workflow(gcp_project: str, project_num: str, location: str, repo_name: str, tags: list, execute: str,
@@ -105,37 +113,65 @@ def run_workflow(gcp_project: str, project_num: str, location: str, repo_name: s
         tag (str): The target tags to compile and execute.
         branch (str): The Git branch to use.
     """
-    max_retries = 3
-    retry_count = 0
-    role_to_validate = "roles/iam.serviceAccountTokenCreator"
-
     repo_uri = f'projects/{gcp_project}/locations/{location}/repositories/{repo_name}'
     compilation_result = compile_workflow(repo_uri, branch)
+
     if execute:
         workflow_invocation_name = execute_workflow(repo_uri, compilation_result, tags)
-        get_workflow_state(workflow_invocation_name)
+        get_workflow_status(workflow_invocation_name)
 
-#TODO first deployment it takes time for the Dataform requiered SA to came up
-"""
-    while retry_count < max_retries:
-        try:
-            if validate_service_account(gcp_project, f"service-{project_num}@gcp-sa-dataform.iam.gserviceaccount.com",role_to_validate):
-                repo_uri = f'projects/{gcp_project}/locations/{location}/repositories/{repo_name}'
-                compilation_result = compile_workflow(repo_uri, branch)
-                if execute:
-                    workflow_invocation_name = execute_workflow(repo_uri, compilation_result, tags)
-                    get_workflow_state(workflow_invocation_name)
-                    break
-            else:
-                print(f"Default Dataform Service Agent do not have {role_to_validate} role yet, retrying..")
-                time.sleep(10)
-                retry_count += 1
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            break
-    if retry_count == max_retries:
-        print(f"Default Dataform Service Agent do not have {role_to_validate} role. Failed Dataform Creator.")
-"""
+    print(json.dumps({}, indent=2))
+
+def extract_config_name(file_path):
+  """
+  Extracts the config name from a Dataform SQLX file.
+
+  Args:
+    file_path: Path to the SQLX file.
+
+  Returns:
+    The config name as a string, or None if not found.
+  """
+  try:
+    with open(file_path, 'r') as f:
+      content = f.read()
+
+    match = re.search(r'config \{.*?name: "(.*?)"', content, re.DOTALL)
+    if match:
+      return match.group(1)
+    else:
+      logging.info(f"Config name not found in {file_path}.")
+      return None
+  except FileNotFoundError:
+    logging.info(f"File not found: {file_path}")
+    return None
+
+def extract_iam_metadata(file_path):
+  """
+  Extracts IAM metadata from a Dataform SQLX file.
+
+  Args:
+    file_path: Path to the SQLX file.
+
+  Returns:
+    A dictionary containing the IAM metadata, or None if not found.
+  """
+  with open(file_path, 'r') as f:
+    content = f.read()
+
+  match = re.search(r'//iam_metadata: ({[\s\S]*?})', content)
+  if match:
+    json_str = match.group(1).replace("//", "")
+    try:
+      iam_metadata = json.loads(json_str)
+      return iam_metadata
+    except json.JSONDecodeError:
+      logging.info("Error decoding JSON metadata.")
+      return None
+  else:
+    logging.info("IAM metadata not found in the file.")
+    return None
+
 
 def validate_service_account(project_id, service_account_email, required_role):
     """
@@ -171,8 +207,7 @@ def validate_service_account(project_id, service_account_email, required_role):
 
     return False
 
-    print(
-        f"Service account {service_account_email} does not have the role {required_role} in project {project_id}.")
+    logging.info(f"Service account {service_account_email} does not have the role {required_role} in project {project_id}.")
     return False
 
 def main(args: collections.abc.Sequence[str]) -> int:

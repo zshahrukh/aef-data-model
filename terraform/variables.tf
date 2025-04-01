@@ -23,11 +23,17 @@ variable "overwrite_metadata" {
   description = "Whether to overwrite existing Dataplex (Cortex Datamesh) metadata."
   type        = string
   nullable    = false
-  default = false
+  default     = false
 }
 
 variable "create_dataform_datasets" {
-  description = "Controls whether the datasets found in the dataform.json files in the repositories will be created alongside Terraform resources. If false datasets should be created manually or as an additional step in the CICD pipeline."
+  description = "Controls whether the datasets found in the dataform.json files in the repositories will be created alongside Terraform resources. If false datasets should be created otherwise."
+  type        = bool
+  nullable    = false
+}
+
+variable "create_ddl_buckets_datasets" {
+  description = "Controls whether the datasets referenced in the GCS DDL buckets will be created alongside Terraform resources. If false datasets should be created otherwise."
   type        = bool
   nullable    = false
 }
@@ -94,11 +100,11 @@ variable "create_data_buckets" {
 variable "data_buckets" {
   description = "Data buckets."
   type        = map(object({
-    name          = optional(string)
-    region        = optional(string)
-    project       = optional(string)
-    dataplex_lake = optional(string)
-    dataplex_zone = optional(string)
+    name                     = optional(string)
+    region                   = optional(string)
+    project                  = optional(string)
+    dataplex_lake            = optional(string)
+    dataplex_zone            = optional(string)
     auto_discovery_of_tables = optional(string)
   }))
   default = {}
@@ -125,8 +131,11 @@ variable "ddl_buckets" {
     ddl_flavor           = optional(string)
     ddl_project_id       = optional(string)
     ddl_dataset_id       = optional(string)
+    ddl_region           = optional(string)
     ddl_data_bucket_name = optional(string)
     ddl_connection_name  = optional(string)
+    dataplex_lake        = optional(string)
+    dataplex_zone        = optional(string)
   }))
   default = {}
 }

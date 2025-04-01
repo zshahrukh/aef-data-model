@@ -60,12 +60,11 @@ module "secrets" {
   }
 }
 
-resource "google_project_iam_member" "dataform_permissions" {
-  project = var.project
-  role    = "roles/iam.serviceAccountTokenCreator"
-  #default Service Agent needs permission to impersonate our custom Dataform SA
+resource "google_service_account_iam_member" "dataform_permissions" {
+  for_each = toset(["roles/iam.serviceAccountTokenCreator", "roles/iam.serviceAccountUser"])
+  service_account_id = module.aef-dataform-service-account.id
+  role    = each.key
   member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-dataform.iam.gserviceaccount.com"
-  #member  = module.aef-dataform-service-account.iam_email
   depends_on = [module.dataform_with_external_repos, module.secrets]
 }
 
@@ -85,35 +84,48 @@ module "dataform_with_external_repos" {
   }
 }
 
-
 /* Create datasets defined via dataform.json variables if any, it should include 3 variables for each dataset with next format:
     "dataset_id_<DATASET_IDENTIFIER>":"<YOUR_DATASET_NAME>",
     "dataset_projectid_<DATASET_IDENTIFIER>":"<YOUR_DATASET_PROJECT>",
     "dataset_location_<DATASET_IDENTIFIER>":"<YOUR_DATASET_LOCATION>",
 */
-resource "google_bigquery_dataset" "datasets" {
-  for_each    = var.create_dataform_datasets ? local.datasets : {}
-  dataset_id  = each.value.id
-  project     = each.value.projectid
+resource "google_bigquery_dataset" "dataform_datasets" {
+  for_each    = var.create_dataform_datasets ? { for k, v in local.all_created_datasets : k => v if v.from_dataform } : {}
+  dataset_id  = each.value.dataset_id
+  project     = each.value.project
   location    = each.value.location
   description = each.value.description
 }
 
 #Run the dataform scripts found in the repositories
-resource "null_resource" "run_dataform_deployer" {
+resource "null_resource" "install_dataform_dependencies" {
   for_each = var.compile_dataform_repositories ? local.dataform_repositories : {}
   provisioner "local-exec" {
     command = <<EOF
-      python3 -m venv aef_dataform_execuor
-      source aef_dataform_execuor/bin/activate
+      python3 -m venv aef_dataform_executor
+      source aef_dataform_executor/bin/activate
       pip install google-api-core
       pip install google-cloud-dataform
       pip install google-cloud-asset
-      python3 ../cicd-deployers/dataform_runner.py --project_id ${var.project} --project_number ${data.google_project.project.number} --location ${var.region} --repository ${each.key} --tags ddl --execute ${var.execute_dataform_repositories} --branch ${each.value.branch}
     EOF
   }
-  depends_on = [google_project_iam_member.dataform_permissions, module.dataform_with_external_repos, null_resource.run_metadata_deployer]
+  depends_on = [google_service_account_iam_member.dataform_permissions, module.dataform_with_external_repos, null_resource.run_metadata_deployer]
   triggers   = {
     always_run = timestamp()
   }
+}
+
+data "external" "dataform_deploy" {
+  for_each = var.compile_dataform_repositories ? local.dataform_repositories : {}
+
+  program = ["aef_dataform_executor/bin/python3", "../cicd-deployers/dataform_runner.py",
+    "--project_id", var.project,
+    "--project_number", data.google_project.project.number,
+    "--location", var.region,
+    "--repository", each.key,
+    "--tags", "ddl",
+    "--execute", var.execute_dataform_repositories,
+    "--branch", each.value.branch
+  ]
+  depends_on = [null_resource.install_dataform_dependencies,google_service_account_iam_member.dataform_permissions]
 }

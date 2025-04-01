@@ -24,6 +24,10 @@ output "dataform_config_all_vars_from_all_repos" {
   value = local.all_vars
 }
 
-output "datasets" {
-  value = local.variables
+output "dataform_datasets" {
+  value = local.dataform_datasets
+}
+
+output "all_created_datasets" {
+  value = local.all_created_datasets
 }

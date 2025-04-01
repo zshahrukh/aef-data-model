@@ -39,9 +39,9 @@ resource "null_resource" "run_metadata_deployer" {
 # TODO move to Cortex Datamesh (once cortex datamesh supports setting discovery)
 #Create BigQuery dataset Assets in Dataplex, with auto discovery so tables will be discovered and added as entities
 resource "google_dataplex_asset" "dataset_assets" {
-  for_each      = var.include_metadata_in_tfe_deployment ? local.datasets : {}
+  for_each      = var.include_metadata_in_tfe_deployment ? local.all_created_datasets : {}
   project       = var.project
-  name          = replace(each.value.id, "_", "-")
+  name          = replace(each.value.dataset_id, "_", "-")
   location      = each.value.location
   lake          = each.value.lake
   dataplex_zone = each.value.zone
@@ -49,13 +49,13 @@ resource "google_dataplex_asset" "dataset_assets" {
     enabled = true
   }
   resource_spec {
-    name = "projects/${each.value.projectid}/datasets/${each.value.id}"
+    name = "projects/${each.value.project}/datasets/${each.value.dataset_id}"
     type = "BIGQUERY_DATASET"
   }
   labels = {
     domain      = var.domain
   }
-  depends_on = [null_resource.run_metadata_deployer,google_bigquery_dataset.datasets]
+  depends_on = [null_resource.run_metadata_deployer]
 }
 
 #TODO move to Cortex Datamesh (once cortex datamesh supports setting discovery)

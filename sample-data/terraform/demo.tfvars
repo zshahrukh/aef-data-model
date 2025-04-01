@@ -3,7 +3,7 @@ region              = "us-central1"
 
 dataform_repositories = {
   sample-repo-1 = {
-    remote_repo_url      = "https://github.com/<GITHUB_SPACE>/aef-sample-dataform-repo.git"
+    remote_repo_url = "<GITHUB_DATAFORM_REPOSITORY>"
   }
 }
 
