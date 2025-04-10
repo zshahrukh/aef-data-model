@@ -92,9 +92,6 @@ module "dataform" {
   project_id = var.project
   name       = "aef-default-repo"
   region     = var.region
-  iam = {
-    "roles/dataform.editor" = ["user:user1@example.org"]
-  }
 }
 
 /* Create datasets defined via dataform.json variables if any, it should include 3 variables for each dataset with next format:
