@@ -58,6 +58,7 @@ module "secrets" {
       ]
     }
   }
+  depends_on = [module.dataform]
 }
 
 resource "google_service_account_iam_member" "dataform_permissions" {
@@ -65,7 +66,7 @@ resource "google_service_account_iam_member" "dataform_permissions" {
   service_account_id = module.aef-dataform-service-account.id
   role    = each.key
   member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-dataform.iam.gserviceaccount.com"
-  depends_on = [module.dataform_with_external_repos, module.secrets]
+  depends_on = [module.dataform_with_external_repos, module.secrets, module.dataform]
 }
 
 #creates a dataform repository with a remote repository attached to it.
@@ -81,6 +82,18 @@ module "dataform_with_external_repos" {
     branch          = each.value.branch
     secret_name     = each.value.secret_name
     secret_version  = module.secrets[each.key].version_ids["${local.dataform_repositories[each.key].secret_name}:${local.dataform_repositories[each.key].secret_version}"]
+  }
+  depends_on = [module.dataform]
+}
+
+# dataform has a know issue where default SA is not created until first repository is created
+module "dataform" {
+  source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric/modules/dataform-repository"
+  project_id = var.project
+  name       = "aef-default-repo"
+  region     = var.region
+  iam = {
+    "roles/dataform.editor" = ["user:user1@example.org"]
   }
 }
 
