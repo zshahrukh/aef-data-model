@@ -30,6 +30,7 @@ resource "google_storage_bucket" "sample_data_bucket" {
   project                  = var.sample_data_bucket_project
   public_access_prevention = "enforced"
   force_destroy            = true
+  uniform_bucket_level_access = true
 }
 
 # Create temp storage bucket.
@@ -39,6 +40,7 @@ resource "google_storage_bucket" "temp_data_bucket" {
   project                  = var.temp_data_bucket_project
   public_access_prevention = "enforced"
   force_destroy            = true
+  uniform_bucket_level_access = true
 }
 
 resource "google_storage_bucket" "sample_ddl_bucket" {
@@ -47,6 +49,7 @@ resource "google_storage_bucket" "sample_ddl_bucket" {
   project                  = var.sample_ddl_bucket_project
   public_access_prevention = "enforced"
   force_destroy            = true
+  uniform_bucket_level_access = true
 }
 
 # Copy data files to gcs

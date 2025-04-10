@@ -20,6 +20,7 @@ resource "google_storage_bucket" "data_buckets" {
   project                  = each.value.project
   public_access_prevention = "enforced"
   force_destroy            = false
+  uniform_bucket_level_access = true
 }
 
 # Create buckets containing DDLs.
@@ -30,6 +31,7 @@ resource "google_storage_bucket" "ddl_buckets" {
   project                  = each.value.bucket_project
   public_access_prevention = "enforced"
   force_destroy            = false
+  uniform_bucket_level_access = true
 }
 
 resource "google_bigquery_dataset" "gcs_datasets" {

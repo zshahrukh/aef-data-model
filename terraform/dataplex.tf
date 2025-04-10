@@ -19,6 +19,7 @@ resource "google_storage_bucket" "tmp_cortex_bucket" {
   project                  = var.project
   public_access_prevention = "enforced"
   force_destroy            = true
+  uniform_bucket_level_access = true
 }
 
 #Runs the cortex datamesh deployer with the given parameters in the defined folder structure.
