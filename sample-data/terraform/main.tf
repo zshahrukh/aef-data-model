@@ -152,15 +152,10 @@ resource "google_sql_user" "user" {
 
 resource "null_resource" "init_db" {
   provisioner "local-exec" {
-    command = <<EOF
-        curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.9.0/cloud-sql-proxy.darwin.arm64
-        chmod +x cloud-sql-proxy
-        nohup ./cloud-sql-proxy ${var.project}:${var.region}:${module.fake_on_prem_instance.name} >/dev/null & >/dev/null &
-        sleep 3
-        psql "host=127.0.0.1 sslmode=disable dbname=postgres user=user1 password=changeme" -f ../fake-on-prem-postgresql/sample_db_populator.sql
-        PID=$(lsof -i tcp:5432 | grep LISTEN | awk '{print $2}')
-        kill -9 $PID
-      EOF
+    command = "chmod +x ./init_db.sh"
+  }
+  provisioner "local-exec" {
+    command = "./init_db.sh ${var.project} ${var.region} ${module.fake_on_prem_instance.name}"
   }
   depends_on = [google_sql_user.user]
 }
