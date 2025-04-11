@@ -27,9 +27,9 @@ resource "null_resource" "run_metadata_deployer" {
   count = var.include_metadata_in_tfe_deployment ? 1 : 0
   provisioner "local-exec" {
     command = <<EOF
-      python3 -m venv aef_metadata_deployer
-      source aef_metadata_deployer/bin/activate
-      python3 ../cicd-deployers/metadata_deployer.py --project_id ${var.project} --location ${var.region} --overwrite ${var.overwrite_metadata}
+      python3 -m venv aef_metadata_deployer || true
+      source aef_metadata_deployer/bin/activate || true
+      python3 ../cicd-deployers/metadata_deployer.py --project_id ${var.project} --location ${var.region} --overwrite ${var.overwrite_metadata} || true
     EOF
   }
   triggers = {
@@ -37,6 +37,7 @@ resource "null_resource" "run_metadata_deployer" {
   }
   depends_on = [google_storage_bucket.data_buckets]
 }
+
 # TODO move to Cortex Datamesh (once cortex datamesh supports setting discovery)
 #Create BigQuery dataset Assets in Dataplex, with auto discovery so tables will be discovered and added as entities
 resource "google_dataplex_asset" "dataset_assets" {
