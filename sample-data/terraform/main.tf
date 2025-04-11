@@ -84,6 +84,7 @@ resource "google_project_iam_member" "connectionPermissionGrant" {
   project = var.sample_connection_project
   role    = "roles/storage.objectViewer"
   member  = format("serviceAccount:%s", google_bigquery_connection.connection.cloud_resource[0].service_account_id)
+  depends_on = [google_bigquery_connection.connection]
 }
 
 data "github_repository_file" "dataform_config" {
