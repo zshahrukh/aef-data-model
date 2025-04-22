@@ -125,7 +125,7 @@ module "vpc" {
     {
       name          = "default-${var.region}"
       region        = var.region
-      ip_cidr_range = "10.0.0.0/24"
+      ip_cidr_range = "10.10.0.0/16"
     }
   ]
 }
