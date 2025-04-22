@@ -140,8 +140,8 @@ module "firewall" {
   ingress_rules = {
     allow-ingress-all = {
       description = "Allow subnet communication on all ports."
-      source_ranges = ["10.0.0.0/24"]
-      destination_ranges = ["10.0.0.0/24"]
+      source_ranges = ["10.10.0.0/16"]
+      destination_ranges = ["10.10.0.0/16"]
       rules= [{ protocol = "all", ports = [] }]
     }
   }
