@@ -1,5 +1,5 @@
 project = "<PROJECT_ID>"
-region  = "us-central1"
+region  = "us-central2"
 domain  = "example"
 
 include_metadata_in_tfe_deployment = true
@@ -21,13 +21,13 @@ ddl_buckets                 = {
   ddl-bucket-1 = {
     ddl_flavor           = "bigquery"
     bucket_name          = "<PROJECT_ID>-my-sample-ddl-bucket"
-    bucket_region        = "us-central1"
+    bucket_region        = "us-central2"
     bucket_project       = "<PROJECT_ID>"
     ddl_project_id       = "<PROJECT_ID>"
     ddl_dataset_id       = "aef_landing_sample_dataset"
-    ddl_region           = "us-central1"
+    ddl_region           = "us-central2"
     ddl_data_bucket_name = "<PROJECT_ID>-my-sample-data-bucket"
-    ddl_connection_name  = "projects/<PROJECT_ID>/locations/us-central1/connections/sample-connection"
+    ddl_connection_name  = "projects/<PROJECT_ID>/locations/us-central2/connections/sample-connection"
     dataplex_lake        = "aef-sales-lake"
     dataplex_zone        = "aef-landing-sample-zone"
   }
@@ -37,7 +37,7 @@ create_data_buckets = false
 data_buckets        = {
   data-bucket-1 = {
     name          = "<PROJECT_ID>-my-sample-data-bucket"
-    region        = "us-central1"
+    region        = "us-central2"
     project       = "<PROJECT_ID>"
     dataplex_lake = "aef-sales-lake"
     dataplex_zone = "aef-landing-sample-zone"

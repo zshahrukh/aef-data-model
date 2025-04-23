@@ -15,7 +15,7 @@
 project: {{ project_id_tgt }}
 lakes:
   - display_name: "aef-sales-lake"
-    region: "us-central1"
+    region: "us-central2"
     description: "lake for the Sales domain"
     labels:
       - name: "lake_label"
@@ -37,5 +37,5 @@ lakes:
         zone_type: CURATED
         location_type: SINGLE_REGION
   - display_name: "another-sample-lake"
-    region: "us-central1"
+    region: "us-central2"
     description: "Second Sample Lake"

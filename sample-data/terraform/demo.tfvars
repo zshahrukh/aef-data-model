@@ -1,5 +1,5 @@
 project             = "<PROJECT_ID>"
-region              = "us-central1"
+region              = "us-central2"
 
 dataform_repositories = {
   sample-repo-1 = {
@@ -8,10 +8,10 @@ dataform_repositories = {
 }
 
 sample_connection_project = "<PROJECT_ID>"
-sample_connection_region = "us-central1"
+sample_connection_region = "us-central2"
 
 sample_data_bucket_project = "<PROJECT_ID>"
-sample_data_bucket_region = "us-central1"
+sample_data_bucket_region = "us-central2"
 sample_data_files = {
   "location" = {
     name   = "locations/location.csv"
@@ -35,11 +35,11 @@ sample_data_files = {
   }
 }
 
-temp_data_bucket_region = "us-central1"
+temp_data_bucket_region = "us-central2"
 temp_data_bucket_project = "<PROJECT_ID>"
 
 sample_ddl_bucket_project  = "<PROJECT_ID>"
-sample_ddl_bucket_region = "us-central1"
+sample_ddl_bucket_region = "us-central2"
 sample_ddl_files = {
   "sales" = {
     name   = "raw_sales.sql"
