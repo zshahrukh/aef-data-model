@@ -71,6 +71,7 @@ If you decide to use this repository to create datasets referenced in your Dataf
 #### Option 2 - Create a custom external table using SQL
 - Depending on your configuration on the [run_ddls_in_buckets](terraform/variables.tf#L119) and [ddl_buckets](terraform/variables.tf#L125) parameters, .sql files in the referenced DDL buckets will run (at tfe plan/apply time).
   - Following [sample-data example](https://github.com/GoogleCloudPlatform/aef-data-model/blob/542ccd0c4639c88246fe2a28fd58ad7be1365948/sample-data/terraform/demo.tfvars#L43) you could place your DDL files in your repo at the path aef-data-model/sample-data/gcs-files/<YOUR_DDL>.sql to keep track in your repository of the explicit DDLs in environment.
+  - Or just place your DLLs in your [referenced DDL buckets](terraform/variables.tf#L125), DDLs there will run if possible (at tfe plan/apply).
  
 #### Option 3 - Use dataform to track your DDLs
 - Depending on your configuration on the [compile_dataform_repositories](terraform/variables.tf#L47) and [execute_dataform_repositories](terraform/variables.tf#L53) parameters, .sqlx files with ``ddl`` dataform execution tag will run (at tfe plan/apply time).
