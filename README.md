@@ -63,7 +63,21 @@ If you decide to use this repository to create datasets referenced in your Dataf
 │       └── tag_templates.yaml
 ```
 
-### 2. Terraform:
+### 2. Tracking your DDLs
+#### Option 1 - Dataplex Auto-Discovery
+- Dataplex has been configured to auto-create BigQuery tables for data files present in the [data_buckets](terraform/variables.tf#L100). 
+  - Some examples are present in the [demo-data sub-folder here](https://github.com/GoogleCloudPlatform/aef-data-model/blob/542ccd0c4639c88246fe2a28fd58ad7be1365948/sample-data/terraform/demo.tfvars#L15).
+- The discovery job runs once per hour, but you can override this by changing the trigger to a custom Cron job scheduled a few minutes from the current time.
+#### Option 2 - Create a custom external table using SQL
+- Depending on your configuration on the [run_ddls_in_buckets](terraform/variables.tf#L119) and [ddl_buckets](terraform/variables.tf#L125) parameters, .sql files in the referenced DDL buckets will run (at tfe plan/apply time).
+  - Following [sample-data example](https://github.com/GoogleCloudPlatform/aef-data-model/blob/542ccd0c4639c88246fe2a28fd58ad7be1365948/sample-data/terraform/demo.tfvars#L43) you could place your DDL files in your repo at the path aef-data-model/sample-data/gcs-files/<YOUR_DDL>.sql to keep track in your repository of the explicit DDLs in environment.
+ 
+#### Option 3 - Use dataform to track your DDLs
+- Depending on your configuration on the [compile_dataform_repositories](terraform/variables.tf#L47) and [execute_dataform_repositories](terraform/variables.tf#L53) parameters, .sqlx files with ``ddl`` dataform execution tag will run (at tfe plan/apply time).
+  - [Reference your dataform repositories](https://github.com/GoogleCloudPlatform/aef-data-model/blob/542ccd0c4639c88246fe2a28fd58ad7be1365948/terraform/prod.tfvars#L11).
+  - Add your DLLs to your dataform repositories, as the example [here](https://github.com/oscarpulido55/aef-sample-dataform-repo/blob/main/definitions/sources/raw_locations.sqlx).
+
+### 3. Terraform
 While this repository can be used to keep track of your data model and metadata, the provided terraform code can be used to control deployment or just to reference it, so you can deploy it as another step in your CI/CD pipeline.
 
 Define your terraform variables.  It is recommended creating a `.tfvars` file.
